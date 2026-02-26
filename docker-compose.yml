@@ -1,6 +1,6 @@
 services:
   finance-tracker:
-    build: .
+    image: lxnet:finances
     container_name: finance-tracker
     ports:
       - "5000:5000"
