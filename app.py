@@ -903,6 +903,130 @@ def savings_page():
     )
 
 
+@app.route('/stats')
+def stats_page():
+    """Render the statistics dashboard page"""
+    common = get_common_data()
+    today = date.today()
+    
+    # Calculate total savings
+    savings_goals = SavingsGoal.query.all()
+    total_savings = 0
+    for g in savings_goals:
+        balance_amount = sum(
+            t.amount if t.transaction_type == 'deposit' else -t.amount
+            for t in g.transactions
+        )
+        total_savings += balance_amount
+    
+    # Net worth = balance + savings
+    net_worth = common['balance'] + total_savings
+    
+    # Get last 6 months of data for charts
+    monthly_data = []
+    max_monthly = 0
+    total_income_6m = 0
+    total_expenses_6m = 0
+    
+    for i in range(5, -1, -1):
+        month_date = today - relativedelta(months=i)
+        first = date(month_date.year, month_date.month, 1)
+        if month_date.month == 12:
+            last = date(month_date.year + 1, 1, 1)
+        else:
+            last = date(month_date.year, month_date.month + 1, 1)
+        
+        month_transactions = Transaction.query.filter(
+            Transaction.date >= first,
+            Transaction.date < last
+        ).all()
+        
+        income = sum(t.amount for t in month_transactions if t.transaction_type == 'in')
+        expenses = sum(t.amount for t in month_transactions if t.transaction_type == 'out')
+        
+        total_income_6m += income
+        total_expenses_6m += expenses
+        max_monthly = max(max_monthly, income, expenses)
+        
+        monthly_data.append({
+            'month_short': calendar.month_abbr[month_date.month],
+            'income': income,
+            'expenses': expenses
+        })
+    
+    # Calculate averages
+    avg_income = total_income_6m / 6
+    avg_expenses = total_expenses_6m / 6
+    savings_rate = ((avg_income - avg_expenses) / avg_income * 100) if avg_income > 0 else 0
+    
+    # This month's expenses
+    this_month_expenses = sum(t.amount for t in common['transactions'] if t.transaction_type == 'out')
+    
+    # Top spending by budget category this month
+    budget_spending = {}
+    for t in common['transactions']:
+        if t.transaction_type == 'out' and t.budget:
+            if t.budget.name not in budget_spending:
+                budget_spending[t.budget.name] = 0
+            budget_spending[t.budget.name] += t.amount
+    
+    top_budgets = sorted(
+        [{'name': k, 'amount': v} for k, v in budget_spending.items()],
+        key=lambda x: x['amount'],
+        reverse=True
+    )[:5]
+    
+    # Top vendors this month
+    vendor_spending = {}
+    for t in common['transactions']:
+        if t.transaction_type == 'out' and t.vendor:
+            if t.vendor.name not in vendor_spending:
+                vendor_spending[t.vendor.name] = 0
+            vendor_spending[t.vendor.name] += t.amount
+    
+    top_vendors = sorted(
+        [{'name': k, 'amount': v} for k, v in vendor_spending.items()],
+        key=lambda x: x['amount'],
+        reverse=True
+    )[:5]
+    
+    # Biggest single expense this month
+    expenses_only = [t for t in common['transactions'] if t.transaction_type == 'out']
+    biggest_expense = max(expenses_only, key=lambda x: x.amount) if expenses_only else None
+    
+    # Subscription total
+    active_subs = Subscription.query.filter_by(active=True).all()
+    subscription_total = sum(s.amount for s in active_subs if s.frequency == 'monthly')
+    subscription_total += sum(s.amount / 12 for s in active_subs if s.frequency == 'yearly')
+    
+    # Counts
+    transaction_count = len(common['transactions'])
+    active_subscriptions = len(active_subs)
+    savings_goals_count = len(savings_goals)
+    budget_count = Budget.query.count()
+    
+    return render_template('stats.html',
+        active_page='stats',
+        net_worth=net_worth,
+        total_savings=total_savings,
+        monthly_data=monthly_data,
+        max_monthly=max_monthly,
+        avg_income=avg_income,
+        avg_expenses=avg_expenses,
+        savings_rate=savings_rate,
+        this_month_expenses=this_month_expenses,
+        top_budgets=top_budgets,
+        top_vendors=top_vendors,
+        biggest_expense=biggest_expense,
+        subscription_total=subscription_total,
+        transaction_count=transaction_count,
+        active_subscriptions=active_subscriptions,
+        savings_goals_count=savings_goals_count,
+        budget_count=budget_count,
+        **{k: v for k, v in common.items() if k not in ['transactions', 'first_day', 'last_day']}
+    )
+
+
 # Initialize database tables
 with app.app_context():
     db.create_all()

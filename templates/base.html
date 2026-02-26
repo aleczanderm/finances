@@ -30,6 +30,49 @@
             color: #2c3e50;
         }
 
+        .header-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .header-wrapper h1 {
+            margin-bottom: 0;
+        }
+
+        .stats-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stats-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
         .balance-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -312,6 +355,19 @@
                 margin-bottom: 20px;
             }
 
+            .header-wrapper {
+                margin-bottom: 20px;
+            }
+
+            .header-wrapper h1 {
+                font-size: 20px;
+            }
+
+            .stats-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
             .balance-card {
                 padding: 20px 15px;
                 margin-bottom: 20px;
@@ -440,7 +496,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Finance Tracker</h1>
+        <div class="header-wrapper">
+            <h1>Finance Tracker</h1>
+            <a href="{{ url_for('stats_page', year=selected_year, month=selected_month) }}" class="stats-btn {% if active_page == 'stats' %}active{% endif %}">📊 Stats</a>
+        </div>
 
         <div class="month-selector">
             <button class="month-nav-btn" onclick="changeMonth(-1)">&larr;</button>
@@ -525,6 +584,116 @@
 
         function reloadPage() {
             window.location.href = getPageUrl(currentPage, currentYear, currentMonth);
+        }
+
+        // 🎮 Easter Egg 1: Konami Code (↑↑↓↓←→←→BA) - Makes it rain money!
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konamiCode[konamiIndex] || e.key.toLowerCase() === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    makeItRain();
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        function makeItRain() {
+            const symbols = ['💰', '💵', '💸', '🪙', '💎', 'R', '$', '€', '£', '¥'];
+            const container = document.createElement('div');
+            container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;';
+            document.body.appendChild(container);
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const money = document.createElement('div');
+                    money.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    money.style.cssText = `position:absolute;top:-50px;left:${Math.random()*100}%;font-size:${20+Math.random()*30}px;animation:moneyFall ${2+Math.random()*3}s linear forwards;`;
+                    container.appendChild(money);
+                }, i * 100);
+            }
+            
+            if (!document.querySelector('#money-rain-style')) {
+                const style = document.createElement('style');
+                style.id = 'money-rain-style';
+                style.textContent = '@keyframes moneyFall{to{transform:translateY(110vh) rotate(720deg);}}';
+                document.head.appendChild(style);
+            }
+            
+            setTimeout(() => container.remove(), 8000);
+        }
+
+        // 🎉 Easter Egg 2: Click balance 5 times for party mode!
+        let balanceClicks = 0;
+        let balanceClickTimer;
+        document.querySelector('.balance-card')?.addEventListener('click', () => {
+            balanceClicks++;
+            clearTimeout(balanceClickTimer);
+            balanceClickTimer = setTimeout(() => balanceClicks = 0, 2000);
+            
+            if (balanceClicks >= 5) {
+                balanceClicks = 0;
+                partyMode();
+            }
+        });
+
+        function partyMode() {
+            const card = document.querySelector('.balance-card');
+            if (!card) return;
+            
+            card.style.transition = 'all 0.3s';
+            card.style.animation = 'partyPulse 0.5s ease-in-out 6';
+            
+            if (!document.querySelector('#party-style')) {
+                const style = document.createElement('style');
+                style.id = 'party-style';
+                style.textContent = `
+                    @keyframes partyPulse {
+                        0%, 100% { transform: scale(1); filter: hue-rotate(0deg); }
+                        50% { transform: scale(1.05); filter: hue-rotate(180deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Confetti burst
+            const colors = ['#667eea', '#764ba2', '#f39c12', '#27ae60', '#e74c3c', '#3498db'];
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                const rect = card.getBoundingClientRect();
+                confetti.style.cssText = `
+                    position: fixed;
+                    width: 10px; height: 10px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${rect.left + rect.width/2}px;
+                    top: ${rect.top + rect.height/2}px;
+                    pointer-events: none;
+                    z-index: 9999;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    animation: confettiBurst 1s ease-out forwards;
+                    --x: ${(Math.random() - 0.5) * 300}px;
+                    --y: ${(Math.random() - 0.5) * 300}px;
+                    --r: ${Math.random() * 720}deg;
+                `;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 1000);
+            }
+            
+            if (!document.querySelector('#confetti-style')) {
+                const style = document.createElement('style');
+                style.id = 'confetti-style';
+                style.textContent = `
+                    @keyframes confettiBurst {
+                        to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            setTimeout(() => card.style.animation = '', 3000);
         }
     </script>
 

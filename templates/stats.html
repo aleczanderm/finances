@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Finance Tracker{% endblock %}
+
+{% block extra_styles %}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card-header {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.stat-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stat-card-value.positive {
+    color: #27ae60;
+}
+
+.stat-card-value.negative {
+    color: #e74c3c;
+}
+
+.stat-card-subtext {
+    font-size: 13px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.net-worth-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    grid-column: span 2;
+}
+
+.net-worth-card .stat-card-header {
+    color: rgba(255,255,255,0.8);
+}
+
+.net-worth-card .stat-card-value {
+    color: white;
+    font-size: 42px;
+}
+
+.net-worth-card .stat-card-subtext {
+    color: rgba(255,255,255,0.8);
+}
+
+.net-worth-breakdown {
+    display: flex;
+    gap: 30px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.net-worth-item {
+    text-align: center;
+}
+
+.net-worth-item-label {
+    font-size: 12px;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.net-worth-item-value {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.chart-container {
+    height: 200px;
+    margin-top: 15px;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 150px;
+    gap: 8px;
+    padding: 0 10px;
+}
+
+.bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.bar {
+    width: 100%;
+    max-width: 40px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s;
+    margin-top: auto;
+}
+
+.bar.income {
+    background: linear-gradient(to top, #27ae60, #2ecc71);
+}
+
+.bar.expense {
+    background: linear-gradient(to top, #e74c3c, #c0392b);
+}
+
+.bar-label {
+    font-size: 11px;
+    color: #888;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.bar-value {
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item-name {
+    font-weight: 500;
+}
+
+.list-item-value {
+    font-weight: 600;
+    color: #e74c3c;
+}
+
+.list-item-bar {
+    flex: 1;
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    margin: 0 15px;
+    overflow: hidden;
+}
+
+.list-item-bar-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 3px;
+}
+
+.trend-indicator {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.trend-up {
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+.trend-down {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
+.savings-progress-card {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.savings-progress-card .stat-card-header {
+    color: rgba(255,255,255,0.8);
+}
+
+.savings-progress-card .stat-card-value {
+    color: white;
+}
+
+.savings-progress-card .stat-card-subtext {
+    color: rgba(255,255,255,0.8);
+}
+
+.insight-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.insight-good {
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+.insight-warning {
+    background: #fff3e0;
+    color: #f39c12;
+}
+
+.insight-bad {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .net-worth-card {
+        grid-column: span 1;
+    }
+
+    .net-worth-card .stat-card-value {
+        font-size: 32px;
+    }
+
+    .net-worth-breakdown {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .bar-chart {
+        height: 120px;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<div class="section-header">Financial Overview</div>
+
+<div class="stats-grid">
+    <!-- Net Worth Card -->
+    <div class="stat-card net-worth-card">
+        <div class="stat-card-header">Net Worth</div>
+        <div class="stat-card-value">R{{ "%.2f"|format(net_worth) }}</div>
+        <div class="stat-card-subtext">Total balance + savings</div>
+        <div class="net-worth-breakdown">
+            <div class="net-worth-item">
+                <div class="net-worth-item-label">Account Balance</div>
+                <div class="net-worth-item-value">R{{ "%.2f"|format(balance) }}</div>
+            </div>
+            <div class="net-worth-item">
+                <div class="net-worth-item-label">Total Savings</div>
+                <div class="net-worth-item-value">R{{ "%.2f"|format(total_savings) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Average Card -->
+    <div class="stat-card">
+        <div class="stat-card-header">Monthly Average (Last 6 months)</div>
+        <div class="stat-card-value positive">+R{{ "%.2f"|format(avg_income) }}</div>
+        <div class="stat-card-subtext">Income</div>
+        <div class="stat-card-value negative" style="margin-top: 10px;">-R{{ "%.2f"|format(avg_expenses) }}</div>
+        <div class="stat-card-subtext">Expenses</div>
+    </div>
+
+    <!-- Savings Rate Card -->
+    <div class="stat-card savings-progress-card">
+        <div class="stat-card-header">Avg Savings Rate</div>
+        <div class="stat-card-value">{{ "%.1f"|format(savings_rate) }}%</div>
+        <div class="stat-card-subtext">
+            {% if savings_rate >= 20 %}
+            Excellent! You're saving well.
+            {% elif savings_rate >= 10 %}
+            Good progress. Aim for 20%+
+            {% elif savings_rate > 0 %}
+            Every bit counts!
+            {% else %}
+            Consider reducing expenses
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Income vs Expenses Chart -->
+    <div class="stat-card" style="grid-column: span 2;">
+        <div class="stat-card-header">Income vs Expenses (Last 6 months)</div>
+        <div class="chart-container">
+            <div class="bar-chart">
+                {% for m in monthly_data %}
+                <div class="bar-wrapper">
+                    <div class="bar-value">R{{ "%.0f"|format(m.income) }}</div>
+                    <div class="bar income" style="height: {{ (m.income / max_monthly * 100) if max_monthly > 0 else 0 }}%;"></div>
+                    <div class="bar-label">{{ m.month_short }}</div>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar-value">R{{ "%.0f"|format(m.expenses) }}</div>
+                    <div class="bar expense" style="height: {{ (m.expenses / max_monthly * 100) if max_monthly > 0 else 0 }}%;"></div>
+                    <div class="bar-label"></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px; font-size: 12px; color: #888;">
+                <span><span style="display: inline-block; width: 12px; height: 12px; background: #27ae60; border-radius: 2px; margin-right: 5px;"></span>Income</span>
+                <span><span style="display: inline-block; width: 12px; height: 12px; background: #e74c3c; border-radius: 2px; margin-right: 5px;"></span>Expenses</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Spending Categories -->
+    <div class="stat-card">
+        <div class="stat-card-header">Top Spending Categories (This Month)</div>
+        {% if top_budgets %}
+            {% for item in top_budgets %}
+            <div class="list-item">
+                <span class="list-item-name">{{ item.name }}</span>
+                <div class="list-item-bar">
+                    <div class="list-item-bar-fill" style="width: {{ (item.amount / top_budgets[0].amount * 100) }}%;"></div>
+                </div>
+                <span class="list-item-value">R{{ "%.2f"|format(item.amount) }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; color: #888; padding: 20px;">No spending data</div>
+        {% endif %}
+    </div>
+
+    <!-- Top Vendors -->
+    <div class="stat-card">
+        <div class="stat-card-header">Top Vendors (This Month)</div>
+        {% if top_vendors %}
+            {% for item in top_vendors %}
+            <div class="list-item">
+                <span class="list-item-name">{{ item.name }}</span>
+                <div class="list-item-bar">
+                    <div class="list-item-bar-fill" style="width: {{ (item.amount / top_vendors[0].amount * 100) }}%;"></div>
+                </div>
+                <span class="list-item-value">R{{ "%.2f"|format(item.amount) }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; color: #888; padding: 20px;">No vendor data</div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Insights -->
+    <div class="stat-card" style="grid-column: span 2;">
+        <div class="stat-card-header">Quick Insights</div>
+        <div style="margin-top: 10px;">
+            {% if balance > 0 %}
+            <span class="insight-badge insight-good">Positive Balance</span>
+            {% else %}
+            <span class="insight-badge insight-bad">Negative Balance</span>
+            {% endif %}
+
+            {% if this_month_expenses < avg_expenses %}
+            <span class="insight-badge insight-good">Spending Below Average</span>
+            {% elif this_month_expenses > avg_expenses * 1.2 %}
+            <span class="insight-badge insight-warning">Spending 20%+ Above Average</span>
+            {% endif %}
+
+            {% if total_savings > 0 %}
+            <span class="insight-badge insight-good">Savings Growing</span>
+            {% endif %}
+
+            {% if subscription_total > 0 %}
+            <span class="insight-badge insight-warning">R{{ "%.0f"|format(subscription_total) }}/mo in Subscriptions</span>
+            {% endif %}
+
+            {% if biggest_expense %}
+            <span class="insight-badge insight-bad">Biggest: {{ biggest_expense.description }} (R{{ "%.0f"|format(biggest_expense.amount) }})</span>
+            {% endif %}
+        </div>
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; text-align: center;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #667eea;">{{ transaction_count }}</div>
+                    <div style="font-size: 12px; color: #888;">Transactions This Month</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #667eea;">{{ active_subscriptions }}</div>
+                    <div style="font-size: 12px; color: #888;">Active Subscriptions</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #667eea;">{{ savings_goals_count }}</div>
+                    <div style="font-size: 12px; color: #888;">Savings Goals</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #667eea;">{{ budget_count }}</div>
+                    <div style="font-size: 12px; color: #888;">Budget Categories</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block add_button %}
+<!-- No add button on stats page -->
+{% endblock %}
