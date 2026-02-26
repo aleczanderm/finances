@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Income - Finance Tracker{% endblock %}
+
+{% block extra_styles %}
+.income-list {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.income-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px 100px 60px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.income-row:last-child {
+    border-bottom: none;
+}
+
+.income-row:hover {
+    background-color: #fafafa;
+}
+
+.income-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666;
+    letter-spacing: 0.5px;
+}
+
+.income-name {
+    font-weight: 500;
+}
+
+.income-amount {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.income-frequency {
+    color: #888;
+    font-size: 13px;
+}
+
+.income-next {
+    color: #667eea;
+    font-size: 13px;
+}
+
+.income-inactive {
+    opacity: 0.5;
+}
+{% endblock %}
+
+{% block content %}
+<div class="section-header">Income</div>
+
+<div class="income-list">
+    <div class="income-row income-header">
+        <div>Name</div>
+        <div>Amount</div>
+        <div>Frequency</div>
+        <div>Next</div>
+        <div></div>
+    </div>
+
+    {% if incomes %}
+        {% for i in incomes %}
+        <div class="income-row {% if not i.active %}income-inactive{% endif %}">
+            <div class="income-name">{{ i.name }}</div>
+            <div class="income-amount">R{{ "%.2f"|format(i.amount) }}</div>
+            <div class="income-frequency">{{ i.frequency|capitalize }}</div>
+            <div class="income-next">{{ i.get_next_pay_date().strftime('%d %b') }}</div>
+            <div>
+                <button class="toggle-btn" onclick="toggleIncome({{ i.id }})" title="{% if i.active %}Pause{% else %}Resume{% endif %}">{% if i.active %}⏸{% else %}▶{% endif %}</button>
+                <button class="delete-btn" onclick="deleteIncome({{ i.id }})">&times;</button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">No income sources yet</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Income Modal -->
+<div class="modal" id="income-modal">
+    <div class="modal-content">
+        <div class="modal-header">Add Income</div>
+        <form id="income-form">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="income-name" required placeholder="e.g. Salary, Freelance">
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="income-amount" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label>Frequency</label>
+                <select id="income-frequency">
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Pay Day (1-28)</label>
+                <input type="number" id="income-pay-day" min="1" max="28" required value="25">
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('income-modal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function openModal() {
+        document.getElementById('income-modal').classList.add('active');
+    }
+
+    // Add income
+    document.getElementById('income-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const data = {
+            name: document.getElementById('income-name').value,
+            amount: parseFloat(document.getElementById('income-amount').value),
+            frequency: document.getElementById('income-frequency').value,
+            pay_day: parseInt(document.getElementById('income-pay-day').value)
+        };
+
+        try {
+            const response = await fetch('/api/incomes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                reloadPage();
+            } else {
+                alert('Error adding income');
+            }
+        } catch (err) {
+            alert('Error adding income');
+        }
+    });
+
+    // Toggle income
+    async function toggleIncome(id) {
+        try {
+            const response = await fetch(`/api/incomes/${id}/toggle`, { method: 'POST' });
+            if (response.ok) {
+                reloadPage();
+            } else {
+                alert('Error toggling income');
+            }
+        } catch (err) {
+            alert('Error toggling income');
+        }
+    }
+
+    // Delete income
+    async function deleteIncome(id) {
+        if (!confirm('Delete this income source?')) return;
+        
+        try {
+            const response = await fetch(`/api/incomes/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                reloadPage();
+            } else {
+                alert('Error deleting income');
+            }
+        } catch (err) {
+            alert('Error deleting income');
+        }
+    }
+</script>
+{% endblock %}
