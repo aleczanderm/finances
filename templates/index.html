@@ -654,6 +654,302 @@
         .month-today-btn:hover {
             opacity: 0.9;
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .balance-card {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+
+            .balance-amount {
+                font-size: 36px;
+            }
+
+            /* Navigation tabs */
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                gap: 5px;
+            }
+
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab {
+                flex: 0 0 auto;
+                padding: 10px 15px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+
+            /* Month selector */
+            .month-selector {
+                padding: 10px 12px;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .month-display {
+                font-size: 16px;
+                min-width: 140px;
+            }
+
+            .month-nav-btn {
+                font-size: 20px;
+                padding: 5px 8px;
+            }
+
+            /* Modal full width on mobile */
+            .modal-content {
+                width: 95%;
+                max-width: none;
+                padding: 20px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .modal-header {
+                font-size: 18px;
+            }
+
+            /* Add button repositioned */
+            .add-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                font-size: 28px;
+            }
+
+            /* Form elements */
+            .form-group input,
+            .form-group select {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .section-header {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .delete-btn, .edit-btn, .toggle-btn {
+                padding: 8px;
+                font-size: 16px;
+            }
+
+            /* Transaction rows - convert to cards */
+            .transaction-row.transaction-header {
+                display: none;
+            }
+
+            .transaction-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 15px;
+                position: relative;
+            }
+
+            .transaction-date {
+                font-size: 12px;
+                color: #888;
+                width: auto;
+            }
+
+            .transaction-description {
+                width: 100%;
+                font-size: 15px;
+                order: -1;
+            }
+
+            .transaction-vendor,
+            .transaction-category {
+                font-size: 12px;
+                background: #f5f5f5;
+                padding: 3px 8px;
+                border-radius: 4px;
+            }
+
+            .transaction-in,
+            .transaction-out {
+                position: absolute;
+                right: 50px;
+                top: 15px;
+                font-size: 15px;
+            }
+
+            /* Budget rows */
+            .budget-row.budget-header {
+                display: none;
+            }
+
+            .budget-row {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding: 15px;
+                position: relative;
+            }
+
+            .budget-name {
+                font-size: 15px;
+                padding-right: 50px;
+            }
+
+            .budget-amount {
+                font-size: 18px;
+            }
+
+            .budget-spent {
+                width: 100%;
+            }
+
+            /* Subscription rows */
+            .subscription-row.subscription-header {
+                display: none;
+            }
+
+            .subscription-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 15px;
+                position: relative;
+            }
+
+            .subscription-name {
+                width: 100%;
+                font-size: 15px;
+                padding-right: 80px;
+            }
+
+            .subscription-amount {
+                font-size: 16px;
+            }
+
+            .subscription-frequency,
+            .subscription-next {
+                font-size: 12px;
+                background: #f5f5f5;
+                padding: 3px 8px;
+                border-radius: 4px;
+            }
+
+            /* Income rows */
+            .income-row.income-header {
+                display: none;
+            }
+
+            .income-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 15px;
+                position: relative;
+            }
+
+            .income-name {
+                width: 100%;
+                font-size: 15px;
+                padding-right: 80px;
+            }
+
+            .income-amount {
+                font-size: 16px;
+            }
+
+            .income-frequency,
+            .income-next {
+                font-size: 12px;
+                background: #f5f5f5;
+                padding: 3px 8px;
+                border-radius: 4px;
+            }
+
+            /* Savings */
+            .savings-card {
+                padding: 15px;
+            }
+
+            .savings-goal-card {
+                padding: 15px;
+            }
+
+            .savings-goal-balance {
+                font-size: 20px;
+            }
+
+            .savings-transaction-row.savings-transaction-header {
+                display: none;
+            }
+
+            .savings-transaction-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px 15px;
+                position: relative;
+            }
+
+            .savings-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            /* Action buttons positioning */
+            .transaction-row > div:last-child,
+            .budget-row > div:last-child,
+            .subscription-row > div:last-child,
+            .income-row > div:last-child,
+            .savings-transaction-row > div:last-child {
+                position: absolute;
+                right: 10px;
+                top: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .balance-amount {
+                font-size: 30px;
+            }
+
+            .tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .month-selector {
+                justify-content: space-between;
+            }
+
+            .month-display {
+                font-size: 14px;
+                min-width: auto;
+            }
+        }
     </style>
 </head>
 <body>

@@ -65,6 +65,56 @@
     font-weight: 600;
     text-align: right;
 }
+
+/* Mobile styles for transactions */
+@media (max-width: 768px) {
+    .transaction-row.transaction-header {
+        display: none;
+    }
+
+    .transaction-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 15px;
+        position: relative;
+    }
+
+    .transaction-date {
+        font-size: 12px;
+        color: #888;
+        width: auto;
+    }
+
+    .transaction-description {
+        width: 100%;
+        font-size: 15px;
+        order: -1;
+    }
+
+    .transaction-vendor,
+    .transaction-category {
+        font-size: 12px;
+        background: #f5f5f5;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    .transaction-in,
+    .transaction-out {
+        position: absolute;
+        right: 50px;
+        top: 15px;
+        font-size: 15px;
+    }
+
+    .transaction-row > div:last-child {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
 {% endblock %}
 
 {% block content %}

@@ -96,6 +96,40 @@
 .budget-progress-bar.over {
     background: #e74c3c;
 }
+
+/* Mobile styles for budgets */
+@media (max-width: 768px) {
+    .budget-row.budget-header {
+        display: none;
+    }
+
+    .budget-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 15px;
+        position: relative;
+    }
+
+    .budget-name {
+        font-size: 15px;
+        padding-right: 50px;
+    }
+
+    .budget-amount {
+        font-size: 18px;
+    }
+
+    .budget-spent {
+        width: 100%;
+    }
+
+    .budget-row > div:last-child {
+        position: absolute;
+        right: 10px;
+        top: 15px;
+    }
+}
 {% endblock %}
 
 {% block content %}

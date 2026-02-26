@@ -57,6 +57,45 @@
 .subscription-inactive {
     opacity: 0.5;
 }
+
+/* Mobile styles for subscriptions */
+@media (max-width: 768px) {
+    .subscription-row.subscription-header {
+        display: none;
+    }
+
+    .subscription-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 15px;
+        position: relative;
+    }
+
+    .subscription-name {
+        width: 100%;
+        font-size: 15px;
+        padding-right: 80px;
+    }
+
+    .subscription-amount {
+        font-size: 16px;
+    }
+
+    .subscription-frequency,
+    .subscription-next {
+        font-size: 12px;
+        background: #f5f5f5;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    .subscription-row > div:last-child {
+        position: absolute;
+        right: 10px;
+        top: 15px;
+    }
+}
 {% endblock %}
 
 {% block content %}

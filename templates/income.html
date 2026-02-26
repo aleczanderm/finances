@@ -57,6 +57,45 @@
 .income-inactive {
     opacity: 0.5;
 }
+
+/* Mobile styles for income */
+@media (max-width: 768px) {
+    .income-row.income-header {
+        display: none;
+    }
+
+    .income-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 15px;
+        position: relative;
+    }
+
+    .income-name {
+        width: 100%;
+        font-size: 15px;
+        padding-right: 80px;
+    }
+
+    .income-amount {
+        font-size: 16px;
+    }
+
+    .income-frequency,
+    .income-next {
+        font-size: 12px;
+        background: #f5f5f5;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    .income-row > div:last-child {
+        position: absolute;
+        right: 10px;
+        top: 15px;
+    }
+}
 {% endblock %}
 
 {% block content %}
