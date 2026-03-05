@@ -12,10 +12,22 @@
 
 .budget-row {
     display: grid;
-    grid-template-columns: 1fr 120px 150px 60px;
+    grid-template-columns: 1fr 100px 140px 100px 60px;
     padding: 15px 20px;
     border-bottom: 1px solid #eee;
     align-items: center;
+}
+
+.budget-remaining {
+    font-weight: 600;
+}
+
+.budget-remaining.positive {
+    color: #27ae60;
+}
+
+.budget-remaining.negative {
+    color: #e74c3c;
 }
 
 .budget-row:last-child {
@@ -124,6 +136,16 @@
         width: 100%;
     }
 
+    .budget-remaining {
+        font-size: 16px;
+    }
+
+    .budget-remaining::before {
+        content: 'Remaining: ';
+        font-weight: normal;
+        color: #666;
+    }
+
     .budget-row > div:last-child {
         position: absolute;
         right: 10px;
@@ -163,22 +185,27 @@
         <div>Name</div>
         <div>Budget</div>
         <div>Spent</div>
+        <div>Remaining</div>
         <div></div>
     </div>
 
     {% if budgets %}
         {% for b in budgets %}
         {% set spent = budget_spending.get(b.id, 0) %}
+        {% set remaining = b.amount - spent %}
         {% set percentage = (spent / b.amount * 100) if b.amount > 0 else 0 %}
         <div class="budget-row">
             <div class="budget-name">{{ b.name }}</div>
             <div class="budget-amount editable" onclick="editBudgetAmount(this, {{ b.id }}, {{ b.amount }})">R{{ "%.2f"|format(b.amount) }}</div>
             <div class="budget-spent">
-                R{{ "%.2f"|format(spent) }} / R{{ "%.2f"|format(b.amount) }}
+                R{{ "%.2f"|format(spent) }}
                 <div class="budget-progress">
                     <div class="budget-progress-bar {% if percentage <= 75 %}under{% elif percentage <= 100 %}warning{% else %}over{% endif %}" 
                          style="width: {{ [percentage, 100]|min }}%"></div>
                 </div>
+            </div>
+            <div class="budget-remaining {% if remaining >= 0 %}positive{% else %}negative{% endif %}">
+                R{{ "%.2f"|format(remaining) }}
             </div>
             <div>
                 <button class="delete-btn" onclick="deleteBudget({{ b.id }})">&times;</button>
