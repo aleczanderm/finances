@@ -823,13 +823,13 @@ def budgets_page():
     year = common['selected_year']
     month = common['selected_month']
     
-    # Salary period starts on salary_day of selected month
-    salary_start = date(year, month, salary_day)
-    # Salary period ends on (salary_day - 1) of next month (i.e., starts salary_day of next month)
-    if month == 12:
-        salary_end = date(year + 1, 1, salary_day)
+    # Salary period starts on salary_day of PREVIOUS month
+    if month == 1:
+        salary_start = date(year - 1, 12, salary_day)
     else:
-        salary_end = date(year, month + 1, salary_day)
+        salary_start = date(year, month - 1, salary_day)
+    # Salary period ends on salary_day of selected month (exclusive, so up to salary_day - 1)
+    salary_end = date(year, month, salary_day)
     
     # Get transactions for the salary period
     salary_transactions = Transaction.query.filter(
