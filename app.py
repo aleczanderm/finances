@@ -814,16 +814,42 @@ def budgets_page():
     budgets = Budget.query.order_by(Budget.name).all()
     incomes = Income.query.order_by(Income.name).all()
     
-    # Calculate spent per budget for selected month
+    # Get salary day from query param (default to 25)
+    salary_day = request.args.get('salary_day', type=int, default=25)
+    # Clamp salary_day to valid range (1-28)
+    salary_day = max(1, min(28, salary_day))
+    
+    # Calculate salary period dates
+    year = common['selected_year']
+    month = common['selected_month']
+    
+    # Salary period starts on salary_day of selected month
+    salary_start = date(year, month, salary_day)
+    # Salary period ends on (salary_day - 1) of next month (i.e., starts salary_day of next month)
+    if month == 12:
+        salary_end = date(year + 1, 1, salary_day)
+    else:
+        salary_end = date(year, month + 1, salary_day)
+    
+    # Get transactions for the salary period
+    salary_transactions = Transaction.query.filter(
+        Transaction.date >= salary_start,
+        Transaction.date < salary_end
+    ).all()
+    
+    # Calculate spent per budget for salary period
     budget_spending = {}
     for b in budgets:
-        spent = sum(t.amount for t in common['transactions'] if t.budget_id == b.id and t.transaction_type == 'out')
+        spent = sum(t.amount for t in salary_transactions if t.budget_id == b.id and t.transaction_type == 'out')
         budget_spending[b.id] = spent
     
     # Calculate total income and total budgets for unallocated funds
     total_income = sum(i.amount for i in incomes)
     total_budgets = sum(b.amount for b in budgets)
     unallocated = total_income - total_budgets
+    
+    # Format salary period for display
+    salary_period_display = f"{salary_start.strftime('%d %b')} - {(salary_end - relativedelta(days=1)).strftime('%d %b %Y')}"
     
     return render_template('budgets.html',
         active_page='budgets',
@@ -832,6 +858,8 @@ def budgets_page():
         total_income=total_income,
         total_budgets=total_budgets,
         unallocated=unallocated,
+        salary_period=salary_period_display,
+        salary_day=salary_day,
         **{k: v for k, v in common.items() if k not in ['transactions', 'first_day', 'last_day']}
     )
 

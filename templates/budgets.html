@@ -134,6 +134,14 @@
 
 {% block content %}
 <div class="section-header">Budgets</div>
+<div style="text-align: center; color: #666; margin-bottom: 15px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <span>Salary Period: {{ salary_period }}</span>
+    <select id="salary-day-select" onchange="changeSalaryDay(this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.85rem; cursor: pointer;">
+        {% for day in range(1, 29) %}
+        <option value="{{ day }}" {% if day == salary_day %}selected{% endif %}>{{ day }}{{ 'st' if day == 1 else 'nd' if day == 2 else 'rd' if day == 3 else 'th' }}</option>
+        {% endfor %}
+    </select>
+</div>
 
 <div class="budget-summary" style="display: flex; gap: 20px; margin-bottom: 20px;">
     <div style="flex: 1; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
@@ -316,6 +324,13 @@
         } catch (err) {
             alert('Error deleting budget');
         }
+    }
+
+    // Change salary day
+    function changeSalaryDay(day) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('salary_day', day);
+        window.location.href = url.toString();
     }
 </script>
 {% endblock %}

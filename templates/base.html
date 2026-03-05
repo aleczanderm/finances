@@ -546,7 +546,12 @@
         const currentPage = '{{ active_page }}';
 
         function getPageUrl(page, year, month) {
-            return `/${page}?year=${year}&month=${month}`;
+            // Preserve additional URL params (like salary_day) when changing months
+            const url = new URL(window.location.href);
+            url.pathname = `/${page}`;
+            url.searchParams.set('year', year);
+            url.searchParams.set('month', month);
+            return url.toString();
         }
 
         function changeMonth(delta) {
